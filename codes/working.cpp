@@ -132,7 +132,7 @@ vector<Node> AStar(vector<vector<int>>& graph, int src, int dest, const vector<s
                 if (find(schedule[v].begin(), schedule[v].end(), tentative_time) != schedule[v].end()) {
                     continue;
                 }
-                
+
                 if (tentative_g_score < g_score[v]) {
                     pred[v] = current;
                     g_score[v] = tentative_g_score;
@@ -140,6 +140,7 @@ vector<Node> AStar(vector<vector<int>>& graph, int src, int dest, const vector<s
                     open_set.push({f_score[v], v});
                     
                     schedule[v].push_back(tentative_time);
+
                 }
             }
         }
@@ -151,7 +152,7 @@ vector<vector<Node>> findPaths(vector<string>& map, const vector<Node>& starts, 
     vector<vector<int>> graph = createGraph(map);
     vector<vector<Node>> paths;
     unordered_map<int, vector<int>> schedule;
-    
+
     for (int i = 0; i < starts.size(); i++) {
         int srcIndex = toIndex(starts[i].x, starts[i].y, map[0].size());
         int destIndex = toIndex(ends[i].x, ends[i].y, map[0].size());
