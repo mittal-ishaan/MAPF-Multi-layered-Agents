@@ -92,7 +92,7 @@ void printPaths(const vector<vector<Node>>& paths) {
     }
 }
 
-vector<Node> AStar(vector<vector<int>>& graph, int src, int dest, const vector<string>& map) {
+vector<Node> AStar(vector<vector<int>>& graph, int src, int dest, const vector<string>& map, unordered_map<int, vector<int>>& schedule) {
     int num_vertices = graph.size();
     vector<int> g_score(num_vertices, INT_MAX);
     vector<int> f_score(num_vertices, INT_MAX);
@@ -113,11 +113,12 @@ vector<Node> AStar(vector<vector<int>>& graph, int src, int dest, const vector<s
         
         if (current == dest) {
             vector<Node> path;
+            int time = 0;
             while (pred[current] != -1) {
-                path.push_back(Node(current / map_size, current % map_size));
+                path.push_back(Node(current / map_size, current % map_size, time++));
                 current = pred[current];
             }
-            path.push_back(Node(src / map_size, src % map_size));
+            path.push_back(Node(src / map_size, src % map_size, time));
             reverse(path.begin(), path.end());
             return path;
         }
@@ -126,11 +127,20 @@ vector<Node> AStar(vector<vector<int>>& graph, int src, int dest, const vector<s
         for (int v = 0; v < num_vertices; v++) {
             if (graph[current][v] != INT_MAX && !closed_set[v]) {
                 int tentative_g_score = g_score[current] + graph[current][v];
+                int tentative_time = g_score[current] + 1;
+                
+                if (find(schedule[v].begin(), schedule[v].end(), tentative_time) != schedule[v].end()) {
+                    continue;
+                }
+
                 if (tentative_g_score < g_score[v]) {
                     pred[v] = current;
                     g_score[v] = tentative_g_score;
                     f_score[v] = g_score[v] + heuristic(Node(v / map_size, v % map_size), Node(dest / map_size, dest % map_size));
                     open_set.push({f_score[v], v});
+                    
+                    schedule[v].push_back(tentative_time);
+
                 }
             }
         }
@@ -141,23 +151,21 @@ vector<Node> AStar(vector<vector<int>>& graph, int src, int dest, const vector<s
 vector<vector<Node>> findPaths(vector<string>& map, const vector<Node>& starts, const vector<Node>& ends) {
     vector<vector<int>> graph = createGraph(map);
     vector<vector<Node>> paths;
-    
+    unordered_map<int, vector<int>> schedule;
+
     for (int i = 0; i < starts.size(); i++) {
         int srcIndex = toIndex(starts[i].x, starts[i].y, map[0].size());
         int destIndex = toIndex(ends[i].x, ends[i].y, map[0].size());
         
-        vector<Node> path = AStar(graph, srcIndex, destIndex, map);
+        vector<Node> path = AStar(graph, srcIndex, destIndex, map, schedule);
         
         if (path.empty()) {
             cout << "Path not found from (" << starts[i].x << "," << starts[i].y << ") to (" << ends[i].x << "," << ends[i].y << ")" << endl;
             continue;
         }
         
-        // Mark the path as unidirectional
-        for (int j = 0; j < path.size() - 1; j++) {
-            int from = toIndex(path[j].x, path[j].y, map[0].size());
-            int to = toIndex(path[j + 1].x, path[j + 1].y, map[0].size());
-            graph[to][from] = INT_MAX;
+        for (const auto& node : path) {
+            schedule[toIndex(node.x, node.y, map[0].size())].push_back(node.t);
         }
         
         paths.push_back(path);
