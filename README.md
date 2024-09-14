@@ -110,7 +110,3 @@ pre-commit install
 ## Licence
 
 This software is released under the MIT License, see [LICENSE.txt](LICENCE.txt).
-
-## Author
-
-[Keisuke Okumura](https://kei18.github.io)
