@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Pathfinding Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #e9ecef;
+            color: #333;
+        }
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .controls label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .canvas-container {
+            position: relative;
+            width: 700px;
+            height: 700px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        input[type="file"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label for="file-input">Select Map:</label>
+        <input type="file" id="file-input">
+        <label for="csvFileInput">Select Paths:</label>
+        <input type="file" id="csvFileInput">
+        <button id="myButton">Next Step</button>
+    </div>
+    <div class="canvas-container">
+        <canvas class="canvas" id="myCanvas" width="700" height="700"></canvas>
+        <canvas class="canvas" id="myCanvas1" width="700" height="700"></canvas>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
+    <script src="MAPF.js"></script>
+</body>
+</html>
