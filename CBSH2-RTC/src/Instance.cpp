@@ -277,6 +277,7 @@ bool Instance::loadMap()
 	for (int i = 0; i < num_of_rows; i++)
 	{
 		getline(myfile, line);
+		cout<<line<<endl;
 		for (int j = 0; j < num_of_cols; j++)
 		{
 			my_map[linearizeCoordinate(i, j)] = (line[j] != '.');
@@ -381,25 +382,28 @@ bool Instance::loadAgents()
 		while(i < num_of_agents)
 		{
 			getline(myfile, line);
+			cout<<line<<endl;
 			if (count == ids[i])
 			{
 				tokenizer< char_separator<char> > tok(line, sep);
 				tokenizer< char_separator<char> >::iterator beg = tok.begin();
-				beg++; // skip the first number
-				beg++; // skip the map name
-				beg++; // skip the columns
-				beg++; // skip the rows
+				// beg++; // skip the first number
+				// beg++; // skip the map name
+				// beg++; // skip the columns
+				// beg++; // skip the rows
 					   // read start [row,col] for agent i
 				int col = atoi((*beg).c_str());
 				beg++;
 				int row = atoi((*beg).c_str());
 				start_locations[i] = linearizeCoordinate(row, col);
+				cout<<col<<row<<endl;
 				// read goal [row,col] for agent i
 				beg++;
 				col = atoi((*beg).c_str());
 				beg++;
 				row = atoi((*beg).c_str());
 				goal_locations[i] = linearizeCoordinate(row, col);
+				cout<<col<<row<<endl;
 				i++;
 			}
 			count++;

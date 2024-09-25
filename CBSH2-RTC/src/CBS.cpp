@@ -743,6 +743,7 @@ string CBS::getSolverName() const
 	return name;
 }
 
+
 bool CBS::solve(double _time_limit, int _cost_lowerbound, int _cost_upperbound)
 {
 	this->min_f_val = _cost_lowerbound;
@@ -758,308 +759,288 @@ bool CBS::solve(double _time_limit, int _cost_lowerbound, int _cost_upperbound)
 	// set timer
 	start = clock();
 
-	generateRoot();
+    // // Define the inbound station
+    // Point inboundStation = {0, 0}; // Example coordinates for the inbound station
 
-	while (!open_list.empty() && !solution_found)
-	{
-		updateFocalList();
-		if (min_f_val >= cost_upperbound)
-		{
-			solution_cost = (int) min_f_val;
-			solution_found = false;
-			break;
-		}
-		runtime = (double) (clock() - start) / CLOCKS_PER_SEC;
-		if (runtime > time_limit || num_HL_expanded > node_limit
-		    || heuristic_helper.sub_instances.size() >= MAX_NUM_STATS)
-		{  // time/node out
-			solution_cost = -1;
-			solution_found = false;
-			break;
-		}
-		CBSNode* curr = focal_list.top();
-		focal_list.pop();
-		open_list.erase(curr->open_handle);
-		// takes the paths_found_initially and UPDATE all constrained paths found for agents from curr to dummy_start (and lower-bounds)
-		updatePaths(curr);
+    // // Number of robots
+    // int numRobots = 5; // Example number of robots
 
-		if (screen > 1)
-			cout << endl << "Pop " << *curr << endl;
+    // // Initialize start points and goals for each robot
+    // std::vector<Point> startPoints(numRobots, inboundStation);
+    // std::vector<Point> goals = {
+    //     {5, 5}, {10, 10}, {15, 15}, {20, 20}, {25, 25} // Example goal points
+    // };
 
-		if (curr->unknownConf.size() + curr->conflicts.size() == 0) //no conflicts
-		{// found a solution (and finish the while look)
-			solution_found = true;
-			solution_cost = curr->g_val;
-			goal_node = curr;
-			break;
-		}
+    // // Initialize staggered start times
+    // std::vector<int> startTimes(numRobots);
+    // for (int i = 0; i < numRobots; ++i) {
+    //     startTimes[i] = i * 5; // Stagger start times by 5 time units
+    // }
 
-		// debug
-		/*if (curr->time_generated == 15 && num_of_agents > 2)
-		{
-			int a1 = 51, a2 = 54;
-			auto mdd1 = mdd_helper.getMDD(*curr, a1, paths[a1]->size());
-			cout << "The mdd of agent " << a1 << endl;
-			mdd1->printNodes();
-			auto mdd2 = mdd_helper.getMDD(*curr, a2, paths[a2]->size());
-			cout << "The mdd of agent " << a2 << endl;
-			mdd2->printNodes();
-			for (int t = 0; t < min(paths[a1]->size(), paths[a2]->size()); t++)
-			{
-				if (paths[a1]->at(t).location == paths[a2]->at(t).location)
-					rectangle_helper.printOverlapArea(paths, t, a1, a2, mdd1, mdd2);
-			}
-			cout << "The constraints " << endl;
-			curr->printConstraints(a1);
-			curr->printConstraints(a2);
-		}*/
-		/*if (curr->time_generated == 1 && num_of_agents > 2)
-		{
-			int a1 = 12, a2 = 23;
-			auto mdd1 = mdd_helper.getMDD(*curr, a1, paths[a1]->size());
-			cout << "The mdd of agent " << a1 << endl;
-			mdd1->printNodes();
-			auto mdd2 = mdd_helper.getMDD(*curr, a2, paths[a2]->size());
-			cout << "The mdd of agent " << a2 << endl;
-			mdd2->printNodes();
-			for (int t = 0; t < min(paths[a1]->size(), paths[a2]->size()); t++)
-			{
-				if (paths[a1]->at(t).location == paths[a2]->at(t).location)
-					rectangle_helper.printOverlapArea(paths, t, a1, a2, mdd1, mdd2);
-			}
-			cout << "The constraints " << endl;
-			curr->printConstraints(a1);
-			curr->printConstraints(a2);
-		}*/
+    // // Initialize CBS with start points, goals, and start times
+    // initialize(startPoints, goals, startTimes);
 
-		if (!curr->h_computed) // heuristics has not been computed yet
-		{
-			if (PC) // prioritize conflicts
-				classifyConflicts(*curr);
-			runtime = (double) (clock() - start) / CLOCKS_PER_SEC;
-			bool succ = heuristic_helper.computeInformedHeuristics(*curr, time_limit - runtime);
-			runtime = (double) (clock() - start) / CLOCKS_PER_SEC;
-			if (runtime > time_limit)
-			{  // timeout
-				solution_cost = -1;
-				solution_found = false;
-				break;
-			}
-			if (!succ) // no solution, so prune this node
-			{
-				curr->clear();
-				continue;
-			}
+    generateRoot();
 
-			// reinsert the node
-			curr->open_handle = open_list.push(curr);
-			if (curr->g_val + curr->h_val <= focal_list_threshold)
-				curr->focal_handle = focal_list.push(curr);
-			if (screen == 2)
-			{
-				cout << "	Reinsert " << *curr << endl;
-			}
-			continue;
-		}
+    while (!open_list.empty() && !solution_found)
+    {
+        updateFocalList();
+        if (min_f_val >= cost_upperbound)
+        {
+            solution_cost = (int) min_f_val;
+            solution_found = false;
+            break;
+        }
+        runtime = (double) (clock() - start) / CLOCKS_PER_SEC;
+        if (runtime > time_limit || num_HL_expanded > node_limit
+            || heuristic_helper.sub_instances.size() >= MAX_NUM_STATS)
+        {  // time/node out
+            solution_cost = -1;
+            solution_found = false;
+            break;
+        }
+        CBSNode* curr = focal_list.top();
+        focal_list.pop();
+        open_list.erase(curr->open_handle);
+        // takes the paths_found_initially and UPDATE all constrained paths found for agents from curr to dummy_start (and lower-bounds)
+        updatePaths(curr);
 
+        if (screen > 1)
+            cout << endl << "Pop " << *curr << endl;
 
+        if (curr->unknownConf.size() + curr->conflicts.size() == 0) //no conflicts
+        {// found a solution (and finish the while look)
+            solution_found = true;
+            solution_cost = curr->g_val;
+            goal_node = curr;
+            break;
+        }
 
-		//Expand the node
-		num_HL_expanded++;
-		curr->time_expanded = num_HL_expanded;
-		bool foundBypass = true;
-		while (foundBypass)
-		{
-			if (curr->unknownConf.size() + curr->conflicts.size() == 0) //no conflicts
-			{// found a solution (and finish the while look)
-				solution_found = true;
-				solution_cost = curr->g_val;
-				goal_node = curr;
-				break;
-			}
-			foundBypass = false;
-			CBSNode* child[2] = { new CBSNode(), new CBSNode() };
+        if (!curr->h_computed) // heuristics has not been computed yet
+        {
+            if (PC) // prioritize conflicts
+                classifyConflicts(*curr);
+            runtime = (double) (clock() - start) / CLOCKS_PER_SEC;
+            bool succ = heuristic_helper.computeInformedHeuristics(*curr, time_limit - runtime);
+            runtime = (double) (clock() - start) / CLOCKS_PER_SEC;
+            if (runtime > time_limit)
+            {  // timeout
+                solution_cost = -1;
+                solution_found = false;
+                break;
+            }
+            if (!succ) // no solution, so prune this node
+            {
+                curr->clear();
+                continue;
+            }
 
-			curr->conflict = chooseConflict(*curr);
+            // reinsert the node
+            curr->open_handle = open_list.push(curr);
+            if (curr->g_val + curr->h_val <= focal_list_threshold)
+                curr->focal_handle = focal_list.push(curr);
+            if (screen == 2)
+            {
+                cout << "    Reinsert " << *curr << endl;
+            }
+            continue;
+        }
 
-			if (disjoint_splitting && curr->conflict->type == conflict_type::STANDARD)
-			{
-				int first = (bool) (rand() % 2);
-				if (first) // disjoint splitting on the first agent
-				{
-					child[0]->constraints = curr->conflict->constraint1;
-					int a, x, y, t;
-					constraint_type type;
-					tie(a, x, y, t, type) = curr->conflict->constraint1.back();
-					if (type == constraint_type::VERTEX)
-					{
-						child[1]->constraints.emplace_back(a, x, y, t, constraint_type::POSITIVE_VERTEX);
-					}
-					else
-					{
-						assert(type == constraint_type::EDGE);
-						child[1]->constraints.emplace_back(a, x, y, t, constraint_type::POSITIVE_EDGE);
-					}
-				}
-				else // disjoint splitting on the second agent
-				{
-					child[1]->constraints = curr->conflict->constraint2;
-					int a, x, y, t;
-					constraint_type type;
-					tie(a, x, y, t, type) = curr->conflict->constraint2.back();
-					if (type == constraint_type::VERTEX)
-					{
-						child[0]->constraints.emplace_back(a, x, y, t, constraint_type::POSITIVE_VERTEX);
-					}
-					else
-					{
-						assert(type == constraint_type::EDGE);
-						child[0]->constraints.emplace_back(a, x, y, t, constraint_type::POSITIVE_EDGE);
-					}
-				}
-			}
-			else
-			{
-				child[0]->constraints = curr->conflict->constraint1;
-				child[1]->constraints = curr->conflict->constraint2;
-				if (curr->conflict->type == conflict_type::RECTANGLE && rectangle_helper.strategy == rectangle_strategy::DR)
-				{
-					int i = (bool)(rand() % 2);
-					for (const auto constraint : child[1 - i]->constraints)
-					{
-						child[i]->constraints.emplace_back(get<0>(constraint), get<1>(constraint), get<2>(constraint), get<3>(constraint), 
-																							constraint_type::POSITIVE_BARRIER);
-					}
-				}
-				else if (curr->conflict->type == conflict_type::CORRIDOR && corridor_helper.getStrategy() == corridor_strategy::DC)
-				{
-					int i = (bool)(rand() % 2);
-					assert(child[1 - i]->constraints.size() == 1);
-					auto constraint = child[1 - i]->constraints.front();
-					child[i]->constraints.emplace_back(get<0>(constraint), get<1>(constraint), get<2>(constraint), get<3>(constraint),
-						constraint_type::POSITIVE_RANGE);
-				}
-			}
+        //Expand the node
+        num_HL_expanded++;
+        curr->time_expanded = num_HL_expanded;
+        bool foundBypass = true;
+        while (foundBypass)
+        {
+            if (curr->unknownConf.size() + curr->conflicts.size() == 0) //no conflicts
+            {// found a solution (and finish the while look)
+                solution_found = true;
+                solution_cost = curr->g_val;
+                goal_node = curr;
+                break;
+            }
+            foundBypass = false;
+            CBSNode* child[2] = { new CBSNode(), new CBSNode() };
 
-			if (screen > 1)
-				cout << "	Expand " << *curr << endl <<
-					 "	on " << *(curr->conflict) << endl;
+            curr->conflict = chooseConflict(*curr);
 
-			bool solved[2] = { false, false };
-			vector<vector<PathEntry>*> copy(paths);
+            if (disjoint_splitting && curr->conflict->type == conflict_type::STANDARD)
+            {
+                int first = (bool) (rand() % 2);
+                if (first) // disjoint splitting on the first agent
+                {
+                    child[0]->constraints = curr->conflict->constraint1;
+                    int a, x, y, t;
+                    constraint_type type;
+                    tie(a, x, y, t, type) = curr->conflict->constraint1.back();
+                    if (type == constraint_type::VERTEX)
+                    {
+                        child[1]->constraints.emplace_back(a, x, y, t, constraint_type::POSITIVE_VERTEX);
+                    }
+                    else
+                    {
+                        assert(type == constraint_type::EDGE);
+                        child[1]->constraints.emplace_back(a, x, y, t, constraint_type::POSITIVE_EDGE);
+                    }
+                }
+                else // disjoint splitting on the second agent
+                {
+                    child[1]->constraints = curr->conflict->constraint2;
+                    int a, x, y, t;
+                    constraint_type type;
+                    tie(a, x, y, t, type) = curr->conflict->constraint2.back();
+                    if (type == constraint_type::VERTEX)
+                    {
+                        child[0]->constraints.emplace_back(a, x, y, t, constraint_type::POSITIVE_VERTEX);
+                    }
+                    else
+                    {
+                        assert(type == constraint_type::EDGE);
+                        child[0]->constraints.emplace_back(a, x, y, t, constraint_type::POSITIVE_EDGE);
+                    }
+                }
+            }
+            else
+            {
+                child[0]->constraints = curr->conflict->constraint1;
+                child[1]->constraints = curr->conflict->constraint2;
+                if (curr->conflict->type == conflict_type::RECTANGLE && rectangle_helper.strategy == rectangle_strategy::DR)
+                {
+                    int i = (bool)(rand() % 2);
+                    for (const auto constraint : child[1 - i]->constraints)
+                    {
+                        child[i]->constraints.emplace_back(get<0>(constraint), get<1>(constraint), get<2>(constraint), get<3>(constraint), 
+                                                                                            constraint_type::POSITIVE_BARRIER);
+                    }
+                }
+                else if (curr->conflict->type == conflict_type::CORRIDOR && corridor_helper.getStrategy() == corridor_strategy::DC)
+                {
+                    int i = (bool)(rand() % 2);
+                    assert(child[1 - i]->constraints.size() == 1);
+                    auto constraint = child[1 - i]->constraints.front();
+                    child[i]->constraints.emplace_back(get<0>(constraint), get<1>(constraint), get<2>(constraint), get<3>(constraint),
+                        constraint_type::POSITIVE_RANGE);
+                }
+            }
 
-			for (int i = 0; i < 2; i++)
-			{
-				if (i > 0)
-					paths = copy;
-				solved[i] = generateChild(child[i], curr);
-				if (!solved[i])
-				{
-					delete child[i];
-					continue;
-				}
-				if (child[i]->g_val + child[i]->h_val == min_f_val && curr->unknownConf.size() + curr->conflicts.size() == 0) //no conflicts
-				{// found a solution (and finish the while look)
-					break;
-				}
-				else if (bypass && child[i]->g_val == curr->g_val && child[i]->tie_breaking < curr->tie_breaking) // Bypass1
-				{
-					if (i == 1 && !solved[0])
-						continue;
-					foundBypass = true;
-					num_adopt_bypass++;
-					curr->conflicts = child[i]->conflicts;
-					curr->unknownConf = child[i]->unknownConf;
-					curr->tie_breaking = child[i]->tie_breaking;
-					curr->conflict = nullptr;
-					for (const auto& path : child[i]->paths) // update paths
-					{
-						auto p = curr->paths.begin();
-						while (p != curr->paths.end())
-						{
-							if (path.first == p->first)
-							{
-								p->second = path.second;
-								paths[p->first] = &p->second;
-								break;
-							}
-							++p;
-						}
-						if (p == curr->paths.end())
-						{
-							curr->paths.emplace_back(path);
-							paths[path.first] = &curr->paths.back().second;
-						}
-					}
-					if (screen > 1)
-					{
-						cout << "	Update " << *curr << endl;
-					}
-					break;
-				}
-			}
-			if (foundBypass)
-			{
-				for (auto & i : child)
-				{
-					delete i;
-					i = nullptr;
-				}
+            if (screen > 1)
+                cout << "    Expand " << *curr << endl <<
+                     "    on " << *(curr->conflict) << endl;
+
+            bool solved[2] = { false, false };
+            vector<vector<PathEntry>*> copy(paths);
+
+            for (int i = 0; i < 2; i++)
+            {
+                if (i > 0)
+                    paths = copy;
+                solved[i] = generateChild(child[i], curr);
+                if (!solved[i])
+                {
+                    delete child[i];
+                    continue;
+                }
+                if (child[i]->g_val + child[i]->h_val == min_f_val && curr->unknownConf.size() + curr->conflicts.size() == 0) //no conflicts
+                {// found a solution (and finish the while look)
+                    break;
+                }
+                else if (bypass && child[i]->g_val == curr->g_val && child[i]->tie_breaking < curr->tie_breaking) // Bypass1
+                {
+                    if (i == 1 && !solved[0])
+                        continue;
+                    foundBypass = true;
+                    num_adopt_bypass++;
+                    curr->conflicts = child[i]->conflicts;
+                    curr->unknownConf = child[i]->unknownConf;
+                    curr->tie_breaking = child[i]->tie_breaking;
+                    curr->conflict = nullptr;
+                    for (const auto& path : child[i]->paths) // update paths
+                    {
+                        auto p = curr->paths.begin();
+                        while (p != curr->paths.end())
+                        {
+                            if (path.first == p->first)
+                            {
+                                p->second = path.second;
+                                paths[p->first] = &p->second;
+                                break;
+                            }
+                            ++p;
+                        }
+                        if (p == curr->paths.end())
+                        {
+                            curr->paths.emplace_back(path);
+                            paths[path.first] = &curr->paths.back().second;
+                        }
+                    }
+                    if (screen > 1)
+                    {
+                        cout << "    Update " << *curr << endl;
+                    }
+                    break;
+                }
+            }
+            if (foundBypass)
+            {
+                for (auto & i : child)
+                {
+                    delete i;
+                    i = nullptr;
+                }
                 if (PC) // prioritize conflicts
                     classifyConflicts(*curr); // classify the new-detected conflicts
-			}
-			else
-			{
-				for (int i = 0; i < 2; i++)
-				{
-					if (solved[i])
-					{
-						pushNode(child[i]);
-						if (screen > 1)
-						{
-							cout << "		Generate " << *child[i] << endl;
-						}
-					}
-				}
-			}
-		}
-		if (curr->conflict != nullptr)
-		{
-			switch (curr->conflict->type)
-			{
-			case conflict_type::RECTANGLE:
-				num_rectangle_conflicts++;
-				break;
-			case conflict_type::CORRIDOR:
-				num_corridor_conflicts++;
-				break;
-			case conflict_type::TARGET:
-				num_target_conflicts++;
-				break;
-			case conflict_type::STANDARD:
-				num_standard_conflicts++;
-				break;
-			case conflict_type::MUTEX:
-				num_mutex_conflicts++;
-				break;
-			}
-		}
-		curr->clear();
-	}  // end of while loop
+            }
+            else
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    if (solved[i])
+                    {
+                        pushNode(child[i]);
+                        if (screen > 1)
+                        {
+                            cout << "        Generate " << *child[i] << endl;
+                        }
+                    }
+                }
+            }
+        }
+        if (curr->conflict != nullptr)
+        {
+            switch (curr->conflict->type)
+            {
+            case conflict_type::RECTANGLE:
+                num_rectangle_conflicts++;
+                break;
+            case conflict_type::CORRIDOR:
+                num_corridor_conflicts++;
+                break;
+            case conflict_type::TARGET:
+                num_target_conflicts++;
+                break;
+            case conflict_type::STANDARD:
+                num_standard_conflicts++;
+                break;
+            case conflict_type::MUTEX:
+                num_mutex_conflicts++;
+                break;
+            }
+        }
+        curr->clear();
+    }  // end of while loop
 
-
-	runtime = (double) (clock() - start) / CLOCKS_PER_SEC;
-	if (solution_found && !validateSolution())
-	{
-		cout << "Solution invalid!!!" << endl;
-		printPaths();
-		exit(-1);
-	}
-	if (screen == 2)
+    runtime = (double) (clock() - start) / CLOCKS_PER_SEC;
+    if (solution_found && !validateSolution())
+    {
+        cout << "Solution invalid!!!" << endl;
         printPaths();
-	if (screen > 0) // 1 or 2
-		printResults();
-	return solution_found;
+        exit(-1);
+    }
+    if (screen == 2)
+        printPaths();
+    if (screen > 0) // 1 or 2
+        printResults();
+    return solution_found;
 }
 
 
