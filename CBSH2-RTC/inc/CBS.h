@@ -5,6 +5,21 @@
 #include "CorridorReasoning.h"
 #include "MutexReasoning.h"
 
+struct Point {
+    int x;
+    int y;
+
+    Point(int x = 0, int y = 0) : x(x), y(y) {}
+
+    bool operator==(const Point& other) const {
+        return x == other.x && y == other.y;
+    }
+
+    bool operator!=(const Point& other) const {
+        return !(*this == other);
+    }
+};
+
 class CBS
 {
 public:
@@ -75,6 +90,12 @@ public:
     void savePaths(const string &fileName) const; // write the paths to a file
 
 	void clear(); // used for rapid random  restart
+	void initialize(const std::vector<Point>& startPoints, const std::vector<Point>& goals, const std::vector<int>& startTimes) {
+        // Initialize the CBS algorithm with start points, goals, and start times
+        this->startPoints = startPoints;
+        this->goals = goals;
+        this->startTimes = startTimes;
+    }
 
 private:
 	bool target_reasoning; // using target reasoning
@@ -83,6 +104,9 @@ private:
 	bool bypass; // using Bypass1
 	bool PC; // prioritize conflicts
 	bool save_stats;
+	std::vector<Point> startPoints;
+    std::vector<Point> goals;
+    std::vector<int> startTimes;
 
 	MDDTable mdd_helper;	
 	RectangleReasoning rectangle_helper;

@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
-
+	cout<<vm["agents"].as<string>()<<endl;
 	if (vm.count("help"))
 	{
 		cout << desc << endl;
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
 	cbs.setSavingStats(vm["stats"].as<bool>());
 	cbs.setNodeLimit(vm["nodeLimit"].as<int>());
 
-
+	cout<<"here"<<endl;
 	//////////////////////////////////////////////////////////////////////
 	/// run
     //////////////////////////////////////////////////////////////////////
