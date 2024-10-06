@@ -44,3 +44,5 @@
 openFrameworks-Info.plist
 third_party
 bin
+venv/
+Main-CBS/__pycache__/
