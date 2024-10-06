@@ -67,11 +67,15 @@ def import_mapf_instance(filename):
     goals = []
     for a in range(num_agents):
         line = f.readline()
-        sx, sy, gx, gy = [int(x) for x in line.split(' ')]
-        starts.append((sx, sy))
-        goals.append((gx, gy))
+        arr = [int(x) for x in line.split(' ')]
+        start_agent = []
+        goal_agent = []
+        for i in range(len(arr)//4):
+            start_agent.append((arr[4*i], arr[4*i+1]))
+            goal_agent.append((arr[4*i+2], arr[4*i+3]))
+        starts.append(start_agent)
+        goals.append(goal_agent)
     f.close()
-    print(my_map)
     return my_map, starts, goals
 
 
@@ -107,7 +111,8 @@ if __name__ == '__main__':
 
         print("***Import an instance***")
         my_map, starts, goals = import_mapf_instance(file)
-        print_mapf_instance(my_map, starts, goals)
+        # TODO: fix this function as per the new format i.e. multiple starts and goals (multi-layered)
+        # print_mapf_instance(my_map, starts, goals)
 
         if args.solver == "CBS":
             print("***Run CBS***")

@@ -5,14 +5,35 @@ import numpy as np
 from matplotlib import animation
 import matplotlib.patheffects as PathEffects
 
+import matplotlib
+matplotlib.use('TkAgg')
+
 Colors = ['#3498db', '#f1c40f', '#8e44ad', '#e67e22', '#e74c3c', '#1abc9c', '#2ecc71', '#e84393', '#2c3e50']
+
 
 class Animation:
     def __init__(self, my_map, starts, goals, paths):
         self.my_map = np.flip(np.transpose(my_map), 1)
-        self.starts = [(start[1], len(self.my_map[0]) - 1 - start[0]) for start in starts]
-        self.goals = [(goal[1], len(self.my_map[0]) - 1 - goal[0]) for goal in goals]
-        self.paths = [[(loc[1], len(self.my_map[0]) - 1 - loc[0]) for loc in path] for path in paths]
+        self.agent_length = []
+        # self.my_map = my_map
+        self.starts = []
+        for start in starts:
+            st = []
+            for i in range(len(start)):
+                st.append((start[i][1], len(self.my_map[0]) - 1 - start[i][0]))
+            self.starts.append(st)
+        self.goals = []
+        for goal in goals:
+            gl = []
+            for i in range(len(goal)):
+                gl.append((goal[i][1], len(self.my_map[0]) - 1 - goal[i][0]))
+            self.goals.append(gl)
+        self.paths = []
+        if paths:   
+            for path in paths:
+                self.paths.append([])
+                for loc in path:
+                    self.paths[-1].append((loc[1], len(self.my_map[0]) - 1 - loc[0]))
 
         aspect = len(self.my_map) / len(self.my_map[0])
 
@@ -37,6 +58,7 @@ class Animation:
         plt.xlim(x_min, x_max)
         plt.ylim(y_min, y_max)
 
+        # self.patches.append(Rectangle((x_min, y_min), x_max - x_min, y_max - y_min, facecolor='none', edgecolor='gray'))
         # Draw grid with slightly darker cells for obstacles
         for i in range(len(self.my_map)):
             for j in range(len(self.my_map[0])):
@@ -50,20 +72,22 @@ class Animation:
         # Draw agents and their goals
         self.T = 0
         for i, goal in enumerate(self.goals):
-            self.patches.append(Rectangle((goal[0] - 0.25, goal[1] - 0.25), 0.5, 0.5, facecolor=Colors[i % len(Colors)],
-                                          edgecolor='black', alpha=0.3))
-
+            for j in range(len(goal)):
+                self.patches.append(Rectangle((goal[j][0] - 0.25, goal[j][1] - 0.25), 0.5, 0.5, facecolor=Colors[i % len(Colors)],
+                                              edgecolor='black', alpha=0.3))
         # Initialize agent visuals with smooth appearance
         for i, start in enumerate(self.starts):
-            self.patches.append(Circle((start[0], start[1]), 0.1, facecolor=Colors[i % len(Colors)], edgecolor='#ecf0f1', linewidth=2))
+            for j in range(len(start)):
+                self.patches.append(Circle((start[j][0], start[j][1]), 0.1, facecolor=Colors[i % len(Colors)], edgecolor='#ecf0f1', linewidth=2))
         for i in range(len(self.paths)):
             name = str(i)
-            self.agents[i] = Circle((self.starts[i][0], self.starts[i][1]), 0.25, facecolor=Colors[i % len(Colors)], edgecolor='#ecf0f1', lw=2)
+            for j in range(len(self.starts[i])):
+                self.agents[i] = Circle((starts[i][j][0], starts[i][j][1]), 0.25, facecolor=Colors[i % len(Colors)], edgecolor='#ecf0f1', lw=2)
             self.agents[i].original_face_color = Colors[i % len(Colors)]
             self.patches.append(self.agents[i])
 
             # Add agent number text with shadow for readability
-            text = self.ax.text(self.starts[i][0], self.starts[i][1] + 0.25, name, fontsize=12, color='white')
+            text = self.ax.text(self.starts[i][j][0], self.starts[i][j][1] + 0.25, name, fontsize=12, color='white')
             text.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='black')])
             self.agent_names[i] = text
             self.artists.append(self.agent_names[i])
