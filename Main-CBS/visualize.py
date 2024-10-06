@@ -74,20 +74,20 @@ class Animation:
         for i, goal in enumerate(self.goals):
             for j in range(len(goal)):
                 self.patches.append(Rectangle((goal[j][0] - 0.25, goal[j][1] - 0.25), 0.5, 0.5, facecolor=Colors[i % len(Colors)],
-                                              edgecolor='black', alpha=0.5))
+                                              edgecolor='black', alpha=0.3))
         # Initialize agent visuals with smooth appearance
         for i, start in enumerate(self.starts):
             for j in range(len(start)):
                 self.patches.append(Circle((start[j][0], start[j][1]), 0.1, facecolor=Colors[i % len(Colors)], edgecolor='#ecf0f1', linewidth=2))
         for i in range(len(self.paths)):
             name = str(i)
-            for j in range(len(starts[i])):
+            for j in range(len(self.starts[i])):
                 self.agents[i] = Circle((starts[i][j][0], starts[i][j][1]), 0.25, facecolor=Colors[i % len(Colors)], edgecolor='#ecf0f1', lw=2)
             self.agents[i].original_face_color = Colors[i % len(Colors)]
             self.patches.append(self.agents[i])
 
             # Add agent number text with shadow for readability
-            text = self.ax.text(starts[i][j][0], starts[i][j][1] + 0.25, name, fontsize=12, color='white')
+            text = self.ax.text(self.starts[i][j][0], self.starts[i][j][1] + 0.25, name, fontsize=12, color='white')
             text.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='black')])
             self.agent_names[i] = text
             self.artists.append(self.agent_names[i])

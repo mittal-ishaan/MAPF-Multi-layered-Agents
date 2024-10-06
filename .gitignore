@@ -46,3 +46,4 @@ third_party
 bin
 venv/
 Main-CBS/__pycache__/
+Main-CBS/instances/*.txt.paths
