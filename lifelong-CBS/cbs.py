@@ -166,7 +166,7 @@ class CBSSolver(object):
             self.num_of_expanded += 1
         return node
 
-    def find_solution(self, disjoint=True, prevPath=[]):
+    def find_solution(self):
         """ Finds paths for all agents from their start locations to their goal locations
 
         disjoint    - use disjoint splitting or not
@@ -257,7 +257,7 @@ class CBSSolver(object):
     
         return None  # No solution found
     
-    def find_extended_solution(self, index, current_position, prevPath: list, disjoint=True):
+    def find_extended_solution(self, index, current_position, prevPath: list):
         """ Finds paths for all agents from their start locations to their goal locations
 
         disjoint    - use disjoint splitting or not

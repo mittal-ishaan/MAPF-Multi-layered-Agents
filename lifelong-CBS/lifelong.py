@@ -23,7 +23,7 @@ def visualize_movement(layout, goals: list):
     WIDTH = len(layout[0])
     fig, ax = plt.subplots(figsize=(10, 5))
     cbs = CBSSolver(layout, goals)
-    paths = cbs.find_solution(False)
+    paths = cbs.find_solution()
     robot_colors = ['red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 'brown',
                     'pink']  # Different colors for each robot
 

@@ -45,5 +45,5 @@ openFrameworks-Info.plist
 third_party
 bin
 venv/
-Main-CBS/__pycache__/
+**/__pycache__/
 Main-CBS/instances/*.txt.paths
