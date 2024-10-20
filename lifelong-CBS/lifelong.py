@@ -7,36 +7,20 @@ from cbs import CBSSolver
 # Parameters
 WIDTH = 17  # Width of the warehouse
 HEIGHT = 12  # Height of the warehouse
-NUM_ROBOTS = 10  # Number of robots
-OBSTACLE_RATE = 0.15  # Rate of obstacles in the warehouse
-
-# Define possible moves (up, down, left, right)
-DIRECTIONS = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-
-# Node class for the A* algorithm
-class Node:
-    def __init__(self, position, parent=None):
-        self.position = position
-        self.parent = parent
-        self.g = 0  # Cost from start to current node
-        self.h = 0  # Estimated cost to goal
-        self.f = 0  # Total cost
-
-    def __lt__(self, other):
-        return self.f < other.f
 
 # Get a new random goal
 def get_new_goal(layout, goals):
-    goal = (random.randint(1, HEIGHT - 2), random.randint(1, WIDTH - 2))
+    goal = (random.randint(0, HEIGHT - 3), random.randint(0, WIDTH - 2))
     while layout[goal[0]][goal[1]] == 1 or goal in goals:
-        goal = (random.randint(1, HEIGHT - 2), random.randint(1, WIDTH - 2))
+        goal = (random.randint(1, HEIGHT - 3), random.randint(1, WIDTH - 2))
     return goal
 
 
 # Visualize the robot movement with collision avoidance
 def visualize_movement(layout, goals: list):
     plt.ion()  # Turn on interactive mode
+    HEIGHT = len(layout)
+    WIDTH = len(layout[0])
     fig, ax = plt.subplots(figsize=(10, 5))
     cbs = CBSSolver(layout, goals)
     paths = cbs.find_solution(False)
@@ -69,7 +53,7 @@ def visualize_movement(layout, goals: list):
                     goals[i] = [new_goal]
                     print("New goal for robot", i, ":", new_goal)
                     paths = cbs.find_extended_solution(i, current_position, paths)
-                    print(paths)
+        print(paths)
         for i in range(len(paths)):
             paths[i].pop(0)
         ax.set_title("Lifelong Warehouse Robot Movement Simulation with Collision Avoidance")
