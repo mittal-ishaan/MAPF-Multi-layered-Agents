@@ -120,9 +120,9 @@ if __name__ == '__main__':
         # save_paths_to_file(paths, file + '.paths')
         # result_file.write("{},{}\n".format(file, cost))
         visualize_movement(my_map, goals)
-    #     if not args.batch:
-    #         print("***Test paths on a simulation***")
-    #         animation = Animation(my_map, goals)
+        # if not args.batch:
+            # print("***Test paths on a simulation***")
+            # animation = Animation(args,my_map, goals)
     #         # animation.save("output.mp4", 1.0)
     #         animation.show()
     # result_file.close()

@@ -37,7 +37,7 @@ def compute_heuristics(my_map, goal):
             if child_loc[0] < 0 or child_loc[0] >= len(my_map) \
                     or child_loc[1] < 0 or child_loc[1] >= len(my_map[0]):
                 continue
-            if my_map[child_loc[0]][child_loc[1]] == True:  # obstacle
+            if my_map[child_loc[0]][child_loc[1]] == True or my_map[child_loc[0]][child_loc[1]] == 1:  # obstacle
                 continue
             child = {'loc': child_loc, 'cost': child_cost}
             if child_loc in closed_list:
@@ -168,7 +168,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
             if child_loc[0] < 0 or child_loc[0] >= len(my_map) \
                     or child_loc[1] < 0 or child_loc[1] >= len(my_map[0]):
                 continue
-            if my_map[child_loc[0]][child_loc[1]] == True:  # obstacle
+            if my_map[child_loc[0]][child_loc[1]] == 1 or my_map[child_loc[0]][child_loc[1]] == True:  # obstacle
                 continue
             child = {'loc': child_loc,
                      'g_val': curr['g_val'] + 1,

@@ -36,7 +36,6 @@ class Animation:
         paths = self.cbs.find_solution(args.disjoint)
         self.normal_paths = paths
         self.my_map = np.flip(np.transpose(my_map), 1)
-        print(self.my_map)
         self.agent_length = []
         # self.my_map = my_map
         self.starts = []
@@ -85,11 +84,11 @@ class Animation:
         # Draw grid with slightly darker cells for obstacles
         for i in range(len(self.my_map)):
             for j in range(len(self.my_map[0])):
-                if self.my_map[i][j] == 'True':
+                if self.my_map[i][j] == 1:
                     self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='#34495e', edgecolor='#34495e'))
-                if self.my_map[i][j] == 'inbound':
+                if self.my_map[i][j] == 2:
                     self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='#27ae60', edgecolor='#1e8449'))
-                if self.my_map[i][j] == 'outbound':
+                if self.my_map[i][j] == 3:
                     self.patches.append(Rectangle((i - 0.5, j - 0.5), 1, 1, facecolor='#e67e22', edgecolor='#d35400'))
 
         # Draw agents and their goals
@@ -137,6 +136,7 @@ class Animation:
         return self.patches + self.artists
 
     def animate_func(self, t):
+        print("Time: ", t)
         for k in range(len(self.paths)):
             time = int(t / 10)
             if time >= len(self.paths[k]):

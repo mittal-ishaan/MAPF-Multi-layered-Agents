@@ -13,8 +13,8 @@ def normalize_paths(pathA, pathB):
     path1 = pathA.copy()
     path2 = pathB.copy()
     shortest, pad = (path1, len(path2) - len(path1)) if len(path1) < len(path2) else (path2, len(path1) - len(path2))
-    # for _ in range(pad):
-    #     shortest.append(shortest[-1])
+    for _ in range(pad):
+        shortest.append(shortest[-1])
     return path1, path2
 
 
@@ -28,20 +28,20 @@ def detect_collision(pathA, pathB, inbound_stations, outbound_stations):
     # this function detects if an agent collides with another even after one of the two reached the goal
     if len(pathA) == 0 or len(pathB) == 0:
         return None
-    path1, path2 = normalize_paths(pathA, pathB)
+    # path1, path2 = normalize_paths(pathA, pathB)
     ignore_stations = inbound_stations + outbound_stations
-    length = len(path1)
+    length = min(len(pathA),len(pathB))
     for t in range(length):
         # check for vertex collision
-        pos1 = get_location(path1, t)
-        pos2 = get_location(path2, t)
+        pos1 = get_location(pathA, t)
+        pos2 = get_location(pathB, t)
         if pos1 == pos2 and pos1 not in ignore_stations:
             # we return the vertex and the timestep causing the collision
             return [pos1], t, 'vertex'
         # check for edge collision (not if we are in the last timestep)
         if t < length - 1:
-            next_pos1 = get_location(path1, t + 1)
-            next_pos2 = get_location(path2, t + 1)
+            next_pos1 = get_location(pathA, t + 1)
+            next_pos2 = get_location(pathB, t + 1)
             if pos1 == next_pos2 and pos2 == next_pos1 and pos1 not in ignore_stations and next_pos1 not in ignore_stations:
                 # we return the edge and timestep causing the collision
                 return [next_pos2, next_pos1], t + 1, 'edge'
@@ -257,16 +257,14 @@ class CBSSolver(object):
     
         return None  # No solution found
     
-    def find_extended_solution(self, index, goal, prevPath: list, disjoint=True):
+    def find_extended_solution(self, index, current_position, prevPath: list, disjoint=True):
         """ Finds paths for all agents from their start locations to their goal locations
 
         disjoint    - use disjoint splitting or not
         """
 
         self.start_time = timer.time()
-        self.goals[index].pop(0)
-        self.goals[index].append(goal)
-        # Generate the root node
+
         # constraints   - list of constraints
         # paths         - list of paths, one for each agent
         #               [[(x11, y11), (x12, y12), ...], [(x21, y21), (x22, y22), ...], ...]
@@ -275,7 +273,7 @@ class CBSSolver(object):
                 'constraints': [],
                 'paths': [],
                 'collisions': []}
-        path_to_start = a_star(self.my_map, prevPath[index][-1], self.goals[index][0], self.heuristics[self.goals[index][0]], index, root['constraints'])
+        path_to_start = a_star(self.my_map, current_position, self.goals[index][0], self.heuristics[self.goals[index][0]], index, root['constraints'])
         if path_to_start is None:
             raise BaseException('No solutions')
         prevPath[index] += path_to_start
@@ -299,16 +297,16 @@ class CBSSolver(object):
             p = self.pop_node()
             if not p['collisions']:
                 # self.print_results(p)
+                self.open_list = []
                 return p['paths']
             collision = random.choice(p['collisions'])
             constraints = standard_splitting(collision)
             for c in constraints:
-                constraint_key = (c['agent'], tuple(c['loc']), c['timestep'])
-                if constraint_key in self.constraint_counts:
-                    self.constraint_counts[constraint_key] += 1
-                else:
-                    self.constraint_counts[constraint_key] = 1
-
+                # constraint_key = (c['agent'], tuple(c['loc']), c['timestep'])
+                # if constraint_key in self.constraint_counts:
+                #     self.constraint_counts[constraint_key] += 1
+                # else:
+                #     self.constraint_counts[constraint_key] = 1
                 # if self.constraint_counts[constraint_key] >= 3:
                 #     continue
                 q = {'cost': 0,
@@ -316,13 +314,12 @@ class CBSSolver(object):
                      'paths': p['paths'].copy(),
                      'collisions': []}
                 agent = c['agent']
-                print(q['paths'][agent])
-                final_path = a_star(self.my_map, q['paths'][agent][0], self.goals[agent][0], self.heuristics[self.goals[agent][0]], agent, q['constraints'])
-                print(q['paths'])
+                final_path = a_star(self.my_map, p['paths'][agent][0], self.goals[agent][0], self.heuristics[self.goals[agent][0]], agent, q['constraints'])
                 if final_path:
                     q['paths'][agent] = final_path
                     q['collisions'] = detect_collisions(q['paths'], self.inbound_stations, self.outbound_stations)
                     if q['collisions']:
+                        print(q['paths'])
                         print(q['collisions'])
                     q['cost'] = get_sum_of_cost(q['paths'])
                     self.push_node(q)
