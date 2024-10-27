@@ -17,11 +17,15 @@ def get_new_goal(layout, goals):
 
 
 # Visualize the robot movement with collision avoidance
-def visualize_movement(layout, goals: list):
+def visualize_movement(layout, robots: int):
     plt.ion()  # Turn on interactive mode
     HEIGHT = len(layout)
     WIDTH = len(layout[0])
     fig, ax = plt.subplots(figsize=(10, 5))
+    goals = []
+    for i in range(robots):
+        goal = get_new_goal(layout, goals)
+        goals.append(goal)
     cbs = CBSSolver(layout, goals)
     paths = cbs.find_solution()
     robot_colors = ['red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 'brown',
@@ -32,7 +36,7 @@ def visualize_movement(layout, goals: list):
         ax.imshow(layout, cmap='Greys', origin='upper')  # Update layout for obstacles
 
 
-        for i, [goal] in enumerate(goals):
+        for i, goal in enumerate(goals):
             if paths[i]:
                 current_position = paths[i][0]  # Get next position in path
                 ax.plot(current_position[1], current_position[0], marker='o', color=robot_colors[i],
@@ -50,7 +54,7 @@ def visualize_movement(layout, goals: list):
 
                     # Assign a new goal
                     new_goal = get_new_goal(layout, goals)
-                    goals[i] = [new_goal]
+                    goals[i] = new_goal
                     print("New goal for robot", i, ":", new_goal)
                     paths = cbs.find_extended_solution(i, current_position, paths)
         print(paths)

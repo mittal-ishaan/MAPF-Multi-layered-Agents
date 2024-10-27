@@ -63,15 +63,15 @@ def import_mapf_instance(filename):
     line = f.readline()
     num_agents = int(line)
     # #agents lines with the start/goal positions
-    goals = []
-    for a in range(num_agents):
-        line = f.readline()
-        arr = [int(x) for x in line.split(' ')]
-        goal_agent = []
-        goal_agent.append((arr[0], arr[1]))
-        goals.append(goal_agent)
+    # goals = []
+    # for a in range(num_agents):
+    #     line = f.readline()
+    #     arr = [int(x) for x in line.split(' ')]
+    #     goal_agent = []
+    #     goal_agent.append((arr[0], arr[1]))
+    #     goals.append(goal_agent)
     f.close()
-    return my_map, goals
+    return my_map, num_agents
 
 
 
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     for file in sorted(glob.glob(args.instance)):
 
         print("***Import an instance***")
-        my_map, goals = import_mapf_instance(file)
+        my_map, num_agents = import_mapf_instance(file)
         # TODO: fix this function as per the new format i.e. multiple starts and goals (multi-layered)
         # print_mapf_instance(my_map, starts, goals)
 
@@ -119,7 +119,7 @@ if __name__ == '__main__':
         # cost = get_sum_of_cost(paths)
         # save_paths_to_file(paths, file + '.paths')
         # result_file.write("{},{}\n".format(file, cost))
-        visualize_movement(my_map, goals)
+        visualize_movement(my_map, num_agents)
         # if not args.batch:
             # print("***Test paths on a simulation***")
             # animation = Animation(args,my_map, goals)
