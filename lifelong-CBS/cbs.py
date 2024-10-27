@@ -191,7 +191,7 @@ class CBSSolver(object):
                 path_to_start = []
             else:
                 inbound = random.choice(self.inbound_stations)
-                path_to_start = a_star(self.my_map, inbound, self.goals[i], self.heuristics[self.goals[i]], i, root['constraints'])
+                path_to_start = a_star(self.my_map, inbound, self.goals[i], self.heuristics[self.goals[i]], i, root['constraints']) + [self.goals[i]]
                 final_path += path_to_start
             if path_to_start is None:
                 raise BaseException('No solutions')
@@ -229,7 +229,7 @@ class CBSSolver(object):
             collision = random.choice(p['collisions'])
             constraints = standard_splitting(collision)
             for c in constraints:
-                constraint_key = (c['agent'], tuple(c['loc']), c['timestep'])
+                # constraint_key = (c['agent'], tuple(c['loc']), c['timestep'])
                 # if constraint_key in self.constraint_counts:
                 #     self.constraint_counts[constraint_key] += 1
                 # else:
@@ -248,6 +248,7 @@ class CBSSolver(object):
                 else:
                     inbound = random.choice(self.inbound_stations)
                     path_to_start = a_star(self.my_map, inbound, self.goals[agent], self.heuristics[self.goals[agent]], agent, q['constraints'])
+                path_to_start = path_to_start + [self.goals[agent]]
                 final_path += path_to_start
                 if final_path:
                     q['paths'][agent] = final_path
@@ -275,7 +276,7 @@ class CBSSolver(object):
         path_to_start = a_star(self.my_map, current_position, self.goals[index], self.heuristics[self.goals[index]], index, root['constraints'])
         if path_to_start is None:
             raise BaseException('No solutions')
-        prevPath[index] += path_to_start
+        prevPath[index] = path_to_start + [self.goals[index]]
         root['paths'] = prevPath
 
         root['cost'] = get_sum_of_cost(root['paths'])
@@ -314,6 +315,8 @@ class CBSSolver(object):
                      'collisions': []}
                 agent = c['agent']
                 final_path = a_star(self.my_map, p['paths'][agent][0], self.goals[agent], self.heuristics[self.goals[agent]], agent, q['constraints'])
+                if agent == index:
+                    final_path = final_path + [self.goals[index]]
                 if final_path:
                     q['paths'][agent] = final_path
                     q['collisions'] = detect_collisions(q['paths'], self.inbound_stations, self.outbound_stations)
@@ -322,6 +325,7 @@ class CBSSolver(object):
                         print(q['collisions'])
                     q['cost'] = get_sum_of_cost(q['paths'])
                     self.push_node(q)
+        raise BaseException('No solutions found')
 
     def print_results(self, node):
         print("\n Found a solution! \n")

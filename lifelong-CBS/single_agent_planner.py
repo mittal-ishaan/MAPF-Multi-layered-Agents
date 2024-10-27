@@ -164,7 +164,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
         if curr['loc'] == goal_loc:
             return get_path(curr)
         for direction in range(5):
-            child_loc = move(curr['loc'], direction) if direction < 4 else curr['loc']  # Add wait action
+            child_loc = move(curr['loc'], direction)
             if child_loc[0] < 0 or child_loc[0] >= len(my_map) \
                     or child_loc[1] < 0 or child_loc[1] >= len(my_map[0]):
                 continue
