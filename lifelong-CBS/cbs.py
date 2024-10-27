@@ -191,8 +191,8 @@ class CBSSolver(object):
                 path_to_start = []
             else:
                 inbound = random.choice(self.inbound_stations)
-                path_to_start = a_star(self.my_map, inbound, self.goals[i], self.heuristics[self.goals[i]], i, root['constraints']) + [self.goals[i]]
-                final_path += path_to_start
+                path_to_start = a_star(self.my_map, inbound, self.goals[i], self.heuristics[self.goals[i]], i, root['constraints'])
+                final_path = path_to_start + [self.goals[i], self.goals[i]]
             if path_to_start is None:
                 raise BaseException('No solutions')
 
@@ -248,8 +248,7 @@ class CBSSolver(object):
                 else:
                     inbound = random.choice(self.inbound_stations)
                     path_to_start = a_star(self.my_map, inbound, self.goals[agent], self.heuristics[self.goals[agent]], agent, q['constraints'])
-                path_to_start = path_to_start + [self.goals[agent]]
-                final_path += path_to_start
+                final_path = path_to_start + [self.goals[agent], self.goals[agent]]
                 if final_path:
                     q['paths'][agent] = final_path
                     q['collisions'] = detect_collisions(q['paths'], self.inbound_stations, self.outbound_stations)
@@ -276,7 +275,7 @@ class CBSSolver(object):
         path_to_start = a_star(self.my_map, current_position, self.goals[index], self.heuristics[self.goals[index]], index, root['constraints'])
         if path_to_start is None:
             raise BaseException('No solutions')
-        prevPath[index] = path_to_start + [self.goals[index]]
+        prevPath[index] = path_to_start + [self.goals[index]] + [self.goals[index]]
         root['paths'] = prevPath
 
         root['cost'] = get_sum_of_cost(root['paths'])
@@ -316,7 +315,7 @@ class CBSSolver(object):
                 agent = c['agent']
                 final_path = a_star(self.my_map, p['paths'][agent][0], self.goals[agent], self.heuristics[self.goals[agent]], agent, q['constraints'])
                 if agent == index:
-                    final_path = final_path + [self.goals[index]]
+                    final_path = final_path + [self.goals[index]] + [self.goals[index]]
                 if final_path:
                     q['paths'][agent] = final_path
                     q['collisions'] = detect_collisions(q['paths'], self.inbound_stations, self.outbound_stations)
