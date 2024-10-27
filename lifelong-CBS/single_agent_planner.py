@@ -2,7 +2,7 @@ import heapq
 
 
 def move(loc, direction):
-    directions = [(0, -1), (1, 0), (0, 1), (-1, 0), (0,0)]
+    directions = [(0,0), (0, -1), (1, 0), (0, 1), (-1, 0)]
     return loc[0] + directions[direction][0], loc[1] + directions[direction][1]
 
 
@@ -31,7 +31,7 @@ def compute_heuristics(my_map, goal):
     closed_list[goal] = root
     while len(open_list) > 0:
         (cost, loc, curr) = heapq.heappop(open_list)
-        for direction in range(4):
+        for direction in range(5):
             child_loc = move(loc, direction)
             child_cost = cost + 1
             if child_loc[0] < 0 or child_loc[0] >= len(my_map) \

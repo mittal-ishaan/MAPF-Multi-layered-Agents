@@ -55,9 +55,9 @@ def visualize_movement(layout, robots: int):
                     # Assign a new goal
                     new_goal = get_new_goal(layout, goals)
                     goals[i] = new_goal
-                    print("New goal for robot", i, ":", new_goal)
+                    # print("New goal for robot", i, ":", new_goal)
                     paths = cbs.find_extended_solution(i, current_position, paths)
-        print(paths)
+        # print(paths)
         for i in range(len(paths)):
             paths[i].pop(0)
         ax.set_title("Lifelong Warehouse Robot Movement Simulation with Collision Avoidance")
