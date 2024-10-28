@@ -103,7 +103,8 @@ def visualize_movement(layout, robots: int):
                     })
 
         for i in range(len(paths)):
-            paths[i].pop(0)
+            if paths[i]:
+                paths[i].pop(0)
 
         ax.set_title("Lifelong Warehouse Robot Movement Simulation with Collision Avoidance")
         ax.set_xlabel("Width")
