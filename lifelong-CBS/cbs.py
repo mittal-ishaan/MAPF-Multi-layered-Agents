@@ -194,7 +194,7 @@ class CBSSolver(object):
                 path_to_start = a_star(self.my_map, inbound, self.goals[i], self.heuristics[self.goals[i]], i, root['constraints'])
             if path_to_start is None:
                 raise BaseException('No solutions')
-            final_path = path_to_start + [self.goals[i], self.goals[i]]
+            final_path = path_to_start
             root['paths'].append(final_path)
 
         root['cost'] = get_sum_of_cost(root['paths'])
@@ -248,8 +248,7 @@ class CBSSolver(object):
                     inbound = random.choice(self.inbound_stations)
                     path_to_start = a_star(self.my_map, inbound, self.goals[agent], self.heuristics[self.goals[agent]], agent, q['constraints'])
                 if path_to_start:
-                    final_path = path_to_start + [self.goals[agent], self.goals[agent]]
-                    q['paths'][agent] = final_path
+                    q['paths'][agent] = path_to_start
                     q['collisions'] = detect_collisions(q['paths'], self.inbound_stations, self.outbound_stations)
                     q['cost'] = get_sum_of_cost(q['paths'])
                     self.push_node(q)
@@ -274,7 +273,7 @@ class CBSSolver(object):
         path_to_start = a_star(self.my_map, current_position, self.goals[index], self.heuristics[self.goals[index]], index, root['constraints'])
         if path_to_start is None:
             raise BaseException('No solutions')
-        prevPath[index] = path_to_start + [self.goals[index]] + [self.goals[index]]
+        prevPath[index] = path_to_start
         root['paths'] = prevPath
 
         root['cost'] = get_sum_of_cost(root['paths'])
@@ -300,21 +299,23 @@ class CBSSolver(object):
             collision = random.choice(p['collisions'])
             constraints = standard_splitting(collision)
             for c in constraints:
+                agent = c['agent']
+                # if (agent == index and loc == self.goals[index]):
+                #     print(c)
+                #     continue
                 # constraint_key = (c['agent'], tuple(c['loc']), c['timestep'])
                 # if constraint_key in self.constraint_counts:
                 #     self.constraint_counts[constraint_key] += 1
                 # else:
                 #     self.constraint_counts[constraint_key] = 1
                 # if self.constraint_counts[constraint_key] >= 3:
-                #     continue
+                #     wait = 2
                 q = {'cost': 0,
                      'constraints': p['constraints'] + [c],
                      'paths': p['paths'].copy(),
                      'collisions': []}
-                agent = c['agent']
                 final_path = a_star(self.my_map, p['paths'][agent][0], self.goals[agent], self.heuristics[self.goals[agent]], agent, q['constraints'])
                 if final_path:
-                    final_path = final_path + [self.goals[agent]] + [self.goals[agent]]
                     q['paths'][agent] = final_path
                     q['collisions'] = detect_collisions(q['paths'], self.inbound_stations, self.outbound_stations)
                     if q['collisions']:
