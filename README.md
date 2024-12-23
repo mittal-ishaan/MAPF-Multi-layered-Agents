@@ -3,9 +3,9 @@ This repository focuses on Multi-Agent Path Finding (MAPF) in multi-layered envi
 
 ## Repository Structure
 
-- **lifelong/**: Contains implementations for lifelong MAPF scenarios where agents are continuously assigned new tasks.
-- **[Other folders]**: [Brief description of other folders, if applicable.]
-- **visualizer/**: Includes code for visualizing agent paths and interactions within the environment.
+- **lifelong-CBS/**: Contains implementations for lifelong MAPF scenarios where agents are continuously assigned new tasks.
+- **Main-CBS/**: Contains implementations for MAPF in multi-layered environments.
+- **inbound-outbound-CBS/**: Contains implementations for MAPF in multi-layered environments with inbound and outbound stations.
 
 ## Features
 
